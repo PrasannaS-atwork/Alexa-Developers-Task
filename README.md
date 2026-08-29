@@ -1,3 +1,6 @@
+http://alexa-developers-task.vercel.app/
+
+
 Stone Paper Scissors
 
 A simple command-line Stone Paper Scissors game built using Python. The player plays against the computer, which randomly selects its choice in every round.
