@@ -9,34 +9,34 @@ HTML = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Stone Paper Scissors</title>
 
     <style>
         * {
             box-sizing: border-box;
-            margin: 0;
-            padding: 0;
         }
 
         body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            margin: 0;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
         }
 
         .game {
             width: 90%;
             max-width: 600px;
-            background: rgba(255, 255, 255, 0.12);
-            backdrop-filter: blur(10px);
             padding: 35px;
-            border-radius: 20px;
             text-align: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            border-radius: 20px;
+            background: rgba(255,255,255,0.12);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
         }
 
         h1 {
@@ -44,54 +44,47 @@ HTML = """
         }
 
         .subtitle {
-            margin-bottom: 30px;
             opacity: 0.85;
+            margin-bottom: 30px;
         }
 
         .choices {
             display: flex;
             justify-content: center;
-            gap: 15px;
+            gap: 12px;
             flex-wrap: wrap;
-            margin-bottom: 30px;
         }
 
         button {
             border: none;
-            padding: 14px 25px;
+            padding: 14px 22px;
             border-radius: 10px;
             font-size: 16px;
             cursor: pointer;
-            background: white;
-            color: #333;
             transition: 0.2s;
         }
 
         button:hover {
             transform: translateY(-3px);
-            background: #f1f1f1;
+        }
+
+        .choice {
+            background: white;
+            color: #333;
         }
 
         .result {
             min-height: 120px;
-            margin: 20px 0;
-        }
-
-        .result h2 {
-            margin-bottom: 10px;
+            margin: 30px 0 15px;
         }
 
         .scores {
             display: flex;
             justify-content: space-around;
-            margin-top: 25px;
+            margin-top: 20px;
             padding: 20px;
-            background: rgba(0, 0, 0, 0.15);
             border-radius: 12px;
-        }
-
-        .score-box {
-            font-size: 18px;
+            background: rgba(0,0,0,0.15);
         }
 
         .score {
@@ -105,10 +98,6 @@ HTML = """
             margin-top: 25px;
             background: #ff6b6b;
             color: white;
-        }
-
-        .reset:hover {
-            background: #ff5252;
         }
     </style>
 </head>
@@ -124,86 +113,99 @@ HTML = """
     </p>
 
     <div class="choices">
-        <button onclick="play('stone')">🪨 Stone</button>
-        <button onclick="play('paper')">📄 Paper</button>
-        <button onclick="play('scissors')">✂️ Scissors</button>
+        <button class="choice" onclick="play('stone')">
+            🪨 Stone
+        </button>
+
+        <button class="choice" onclick="play('paper')">
+            📄 Paper
+        </button>
+
+        <button class="choice" onclick="play('scissors')">
+            ✂️ Scissors
+        </button>
     </div>
 
     <div class="result" id="result">
         <h2>Make your choice!</h2>
-        <p>Let's see who wins.</p>
+        <p>The game starts when you choose an option.</p>
     </div>
 
     <div class="scores">
-        <div class="score-box">
+        <div>
             👤 You
             <span class="score" id="userScore">0</span>
         </div>
 
-        <div class="score-box">
+        <div>
             🤖 Computer
             <span class="score" id="computerScore">0</span>
         </div>
     </div>
 
-    <button class="reset" onclick="resetGame()">Reset Game</button>
+    <button class="reset" onclick="resetGame()">
+        Reset Game
+    </button>
 
 </div>
 
 <script>
-    let userScore = 0;
-    let computerScore = 0;
 
-    async function play(choice) {
+let userScore = 0;
+let computerScore = 0;
 
-        const response = await fetch("/api/play", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                choice: choice
-            })
-        });
+async function play(choice) {
 
-        const data = await response.json();
+    const response = await fetch("/api/play", {
+        method: "POST",
 
-        if (data.error) {
-            return;
-        }
+        headers: {
+            "Content-Type": "application/json"
+        },
 
-        userScore = data.user_score;
-        computerScore = data.computer_score;
+        body: JSON.stringify({
+            choice: choice
+        })
+    });
 
-        document.getElementById("userScore").textContent = userScore;
-        document.getElementById("computerScore").textContent = computerScore;
+    const data = await response.json();
 
-        document.getElementById("result").innerHTML = `
-            <h2>${data.message}</h2>
-            <p>You chose <strong>${data.user_choice}</strong></p>
-            <p>Computer chose <strong>${data.computer_choice}</strong></p>
-        `;
+    if (data.error) {
+        return;
     }
 
-    async function resetGame() {
-
-        const response = await fetch("/api/reset", {
-            method: "POST"
-        });
-
-        const data = await response.json();
-
-        userScore = 0;
-        computerScore = 0;
-
-        document.getElementById("userScore").textContent = "0";
-        document.getElementById("computerScore").textContent = "0";
-
-        document.getElementById("result").innerHTML = `
-            <h2>Game Reset!</h2>
-            <p>Choose your move to start again.</p>
-        `;
+    if (data.result === "user") {
+        userScore++;
     }
+    else if (data.result === "computer") {
+        computerScore++;
+    }
+
+    document.getElementById("userScore").textContent = userScore;
+    document.getElementById("computerScore").textContent = computerScore;
+
+    document.getElementById("result").innerHTML = `
+        <h2>${data.message}</h2>
+        <p>You chose <strong>${data.user_choice}</strong></p>
+        <p>Computer chose <strong>${data.computer_choice}</strong></p>
+    `;
+}
+
+
+function resetGame() {
+
+    userScore = 0;
+    computerScore = 0;
+
+    document.getElementById("userScore").textContent = "0";
+    document.getElementById("computerScore").textContent = "0";
+
+    document.getElementById("result").innerHTML = `
+        <h2>Game Reset! 🔄</h2>
+        <p>Choose your move to start again.</p>
+    `;
+}
+
 </script>
 
 </body>
@@ -226,23 +228,15 @@ def play():
     choices = ["stone", "paper", "scissors"]
 
     if user_choice not in choices:
-        return jsonify({"error": "Invalid choice"}), 400
+        return jsonify({
+            "error": "Invalid choice"
+        }), 400
 
     computer_choice = random.choice(choices)
 
-    # Scores are stored using the Flask session-like
-    # approach below through cookies would be preferable,
-    # but for this simple project we use global variables.
-    global user_score, computer_score
-
-    try:
-        user_score
-        computer_score
-    except NameError:
-        user_score = 0
-        computer_score = 0
-
     if user_choice == computer_choice:
+
+        result = "draw"
         message = "It's a Draw! 🤝"
 
     elif (
@@ -252,32 +246,20 @@ def play():
         or
         (user_choice == "scissors" and computer_choice == "paper")
     ):
-        user_score += 1
+
+        result = "user"
         message = "You Win! 🎉"
 
     else:
-        computer_score += 1
+
+        result = "computer"
         message = "Computer Wins! 🤖"
 
     return jsonify({
         "user_choice": user_choice,
         "computer_choice": computer_choice,
-        "message": message,
-        "user_score": user_score,
-        "computer_score": computer_score
-    })
-
-
-@app.route("/api/reset", methods=["POST"])
-def reset():
-
-    global user_score, computer_score
-
-    user_score = 0
-    computer_score = 0
-
-    return jsonify({
-        "message": "Game reset successfully"
+        "result": result,
+        "message": message
     })
 
 
