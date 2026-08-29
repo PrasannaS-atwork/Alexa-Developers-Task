@@ -45,4 +45,4 @@ COMPUTER- 0
 Exiting the Game
 To exit, enter:Exit
 Exit
-Note: The current version is case-sensitive. Use stone, paper, scissors, or EXIT exactly as shown.
+Note: The current version is case-sensitive. Use stone, paper, scissors, or Exit exactly as shown.
